@@ -3,8 +3,9 @@ from typing import Optional, List
 from enum import Enum
 from Notes import Note, NoteName, Interval
 
+
 class Triad(Enum):
-    MAJOR = 1,
+    MAJOR = (1,)
     MINOR = 2
 
 
