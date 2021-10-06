@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import itertools
 from typing import Optional, List, Set
 from enum import Enum
-from .Notes import Note, NoteName, Interval
+from itertools import combinations
+from .Notes import Note, NoteIterator, NoteName, Interval
 
 
 class Triad(Enum):
@@ -37,14 +39,26 @@ class Chord:
     def generate_voicings(
         self,
         range_start: Note = Note(NoteName.C, 3),
-        range_end: Note = Note(NoteName.C, 6),
+        range_end: Note = Note(NoteName.A, 6),
+        voices: int = 4,
     ) -> List[Voicing]:
         """
         Generates all strict (no extensions) voicings for the chord [range_start, range_end)
         """
-        notes = self.get_note_names()
-        # TODO
-        return []
+        note_names: Set[NoteName] = self.get_note_names()
+
+        # Determine all potential chord tones we can use in the range
+        available_notes: List[Note] = []
+        note_iterator = iter(range_start)  # type: ignore
+
+        while next(note_iterator) < range_end:
+            if note_iterator.note.note_name in note_names:
+                available_notes.append(note_iterator.note)
+
+        return [
+            Voicing(list(note_list))
+            for note_list in itertools.combinations(available_notes, voices)
+        ]
 
 
 @dataclass(frozen=True)

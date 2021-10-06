@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import total_ordering
 from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple
@@ -23,6 +24,7 @@ class NoteName(Enum):
 
 
 @dataclass(frozen=True)
+@total_ordering
 class Note:
     """
     Concrete instance of a note - specifies note name and pitch
@@ -30,6 +32,34 @@ class Note:
 
     note_name: NoteName
     octave: int
+
+    def __lt__(self, other: Note) -> bool:
+        return (
+            self.octave < other.octave or self.note_name.value < other.note_name.value
+        )
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Note):
+            return False
+        return (
+            self.note_name.value == other.note_name.value
+            and self.octave == other.octave
+        )
+
+    def __iter__(self) -> NoteIterator:
+        return NoteIterator(self)
+
+
+@dataclass
+class NoteIterator:
+    note: Note
+
+    def __next__(self) -> Note:
+        if self.note.note_name.value + 1 == TEMPERAMENT:
+            self.note = Note(NoteName.C, self.note.octave + 1)
+        else:
+            self.note = Note(NoteName(self.note.note_name.value + 1), self.note.octave)
+        return self.note
 
 
 class Interval(Enum):

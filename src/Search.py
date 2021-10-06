@@ -11,7 +11,7 @@ class DistanceCalculator(ABC):
 
 
 @dataclass(frozen=True)
-class PairiseDistance(DistanceCalculator):
+class PairWiseDistance(DistanceCalculator):
     def distance_between(voicing_1: Voicing, voicing_2: Voicing) -> int:
         return 0
 

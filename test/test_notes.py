@@ -1,6 +1,19 @@
 from src.Notes import NoteName, Note, Interval
 
 
+def test_iterable():
+    iterator = iter(Note(NoteName.AS, 4))
+    assert next(iterator) == Note(NoteName.B, 4)
+    assert next(iterator) == Note(NoteName.C, 5)
+
+
+def test_comparable():
+    assert Note(NoteName.C, 4) == Note(NoteName.C, 4)
+    assert Note(NoteName.C, 3) < Note(NoteName.C, 4)
+    assert Note(NoteName.A, 4) > Note(NoteName.C, 4)
+    assert Note(NoteName.C, 4) < Note(NoteName.B, 4)
+
+
 def test_add_to_note_name():
     c = NoteName.C
     b = NoteName.B
