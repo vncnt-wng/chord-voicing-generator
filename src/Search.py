@@ -116,7 +116,7 @@ class Search:
 
             # Otherwise, expand the current node
             expand(current)
-            print(f"Expanding: {current} with f {value}")
+            print(f"Expanding: {str(current.voicing)} with f {value}")
 
         voicing_list: List[Voicing] = []
         # Traverse the came_from graph to produce the list of voicings

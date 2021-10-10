@@ -99,6 +99,9 @@ class Voicing:
             hash_value += hash(note) * (index + 1) * 200
         return hash_value
 
+    def __str__(self) -> str:
+        return f"[{', '.join([str(note) for note in self.notes])}]"
+
 
 @dataclass(frozen=True)
 class Progression:

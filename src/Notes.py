@@ -53,6 +53,9 @@ class Note:
     def __hash__(self) -> int:
         return self.note_name.value + (self.octave * TEMPERAMENT)
 
+    def __str__(self) -> str:
+        return f"{self.note_name.name}{self.octave}"
+
 
 @dataclass
 class NoteIterator:
