@@ -3,6 +3,7 @@ from __future__ import annotations
 from functools import total_ordering
 from dataclasses import dataclass
 from enum import Enum
+from itertools import tee
 from typing import Tuple
 
 TEMPERAMENT = 12
@@ -48,6 +49,9 @@ class Note:
 
     def __iter__(self) -> NoteIterator:
         return NoteIterator(self)
+
+    def __hash__(self) -> int:
+        return self.note_name.value + (self.octave * TEMPERAMENT)
 
 
 @dataclass

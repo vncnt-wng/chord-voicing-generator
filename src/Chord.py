@@ -5,7 +5,7 @@ import itertools
 from typing import Optional, List, Set
 from enum import Enum
 from itertools import combinations
-from .Notes import Note, NoteIterator, NoteName, Interval
+from .Notes import Note, NoteIterator, NoteName, Interval, TEMPERAMENT
 
 
 class Triad(Enum):
@@ -22,13 +22,17 @@ class Chord:
     # TODO abstract extensions out
     extensions: Optional[List[Interval]] = None
 
+    def get_all_intervals(self) -> List[Interval]:
+        all_intervals: List[Interval] = self.triad.value.copy()
+        if self.extensions:
+            all_intervals += self.extensions
+        return all_intervals
+
     def get_note_names(self) -> Set[NoteName]:
         """
         Returns the set of all intervals of the chord evaluated against the root
         """
-        all_intervals: List[Interval] = self.triad.value.copy()
-        if self.extensions:
-            all_intervals += self.extensions
+        all_intervals: List[Interval] = self.get_all_intervals()
 
         note_names = {
             interval.add_to_note_name(self.root) for interval in all_intervals
@@ -60,10 +64,19 @@ class Chord:
             for note_list in itertools.combinations(available_notes, voices)
         ]
 
+    def __hash__(self):
+        all_intervals = self.get_all_intervals()
+        hash_value = 0
+        for index, interval in enumerate(all_intervals):
+            hash_value += interval.value * index * TEMPERAMENT
+        hash_value = hash_value * (self.root.value + 1) * TEMPERAMENT
+        return hash_value
 
-@dataclass(frozen=True)
+
+@dataclass(frozen=True, eq=True)
 class Voicing:
     # TODO - determine if we should have chord_label: Chord
+    # List of notes ordered
     notes: List[Note]
 
     def is_voicing_for(self, chord: Chord) -> bool:
@@ -72,6 +85,19 @@ class Voicing:
         """
         voicing_note_names = {note.note_name for note in self.notes}
         return voicing_note_names.issubset(chord.get_note_names())
+
+    def __hash__(self) -> int:
+        """
+        Returns a unique integer for every voicing
+        """
+        hash_value = 0
+        sorted_notes = self.notes.copy()
+        sorted_notes.sort()
+        for index, note in enumerate(sorted_notes):
+            # 200 is beyond any reasonable range of notes - typical pianos are 88
+            # in this way each
+            hash_value += hash(note) * (index + 1) * 200
+        return hash_value
 
 
 @dataclass(frozen=True)
