@@ -59,10 +59,28 @@ class Chord:
             if note_iterator.note.note_name in note_names:
                 available_notes.append(note_iterator.note)
 
-        return [
+        # All "valid" voicings
+        candidate_voicings = [
             Voicing(list(note_list))
             for note_list in itertools.combinations(available_notes, voices)
         ]
+
+        # TODO add some kind of filtering to remove voicings with intervals that are too large? perhaps replace itertools.combinations with other generation
+        suitable_voicings = []
+        # If we have more notes than voices, assert that each voicing has no duplicate notenames
+        if len(note_names) > voices:
+            for voicing in candidate_voicings:
+                note_name_set = {note.note_name for note in voicing.notes}
+                if len(note_name_set) == voices:
+                    suitable_voicings.append(voicing)
+        # Otherwise assert all note names are included
+        else:
+            for voicing in candidate_voicings:
+                note_name_set = {note.note_name for note in voicing.notes}
+                if note_name_set == note_names:
+                    suitable_voicings.append(voicing)
+
+        return suitable_voicings
 
     def __hash__(self):
         all_intervals = self.get_all_intervals()
